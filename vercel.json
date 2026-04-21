@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/galeria",
+      "destination": "/"
+    },
+    {
+      "source": "/prints",
+      "destination": "/"
+    },
+    {
+      "source": "/preguntas",
+      "destination": "/"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/"
+    },
+    {
+      "source": "/gracias",
+      "destination": "/"
+    }
+  ]
+}
