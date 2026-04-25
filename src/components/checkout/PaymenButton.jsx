@@ -1,10 +1,15 @@
 import { useCart } from "../../context/useCart";
 
 export default function PaymentButton({ disabled }) {
-  const { cartItems, shipping } = useCart();
+  const { cartItems } = useCart();
 
   const handlePayment = async () => {
     try {
+      if (cartItems.length === 0) {
+        alert("No hay productos en el carrito para iniciar el pago");
+        return;
+      }
+
       const res = await fetch("/api/create-preference", {
         method: "POST",
         headers: {
@@ -12,18 +17,43 @@ export default function PaymentButton({ disabled }) {
         },
         body: JSON.stringify({
           cartItems,
-          shipping,
         }),
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data = {};
 
-      if (data.initPoint) {
-        window.location.href = data.initPoint;
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          throw new Error(
+            `La API devolvio una respuesta invalida (${res.status}).`,
+          );
+        }
       }
+
+      if (!res.ok) {
+        throw new Error(
+          data.error ||
+            `Error creando la preferencia de pago (${res.status})`,
+        );
+      }
+
+      if (!raw) {
+        throw new Error(
+          "La API /api/create-preference no respondio datos. En local, revisa si el backend/API esta levantado.",
+        );
+      }
+
+      if (!data.initPoint) {
+        throw new Error("Mercado Pago no devolvio el enlace de pago");
+      }
+
+      window.location.href = data.initPoint;
     } catch (error) {
       console.error("Error Mercado Pago:", error);
-      alert("No se pudo iniciar el pago");
+      alert(`No se pudo iniciar el pago: ${error.message}`);
     }
   };
 

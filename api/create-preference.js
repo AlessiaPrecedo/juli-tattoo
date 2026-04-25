@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "MP_ACCESS_TOKEN no configurado" });
     }
 
-    const { cartItems = [], shipping = 0 } = req.body || {};
+    const { cartItems = [] } = req.body || {};
 
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return res
@@ -39,15 +39,6 @@ export default async function handler(req, res) {
       unit_price: Number(item.price),
       currency_id: "ARS",
     }));
-
-    if (shipping > 0) {
-      items.push({
-        title: "Costo de envío",
-        quantity: 1,
-        unit_price: Number(shipping),
-        currency_id: "ARS",
-      });
-    }
 
     const preference = await preferenceClient.create({
       body: {

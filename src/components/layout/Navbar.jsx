@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useCart } from "../../context/useCart";
-import CartDrawer from "../cart/CartDrawer";
 import "../../styles/Navbar.css";
 
 const navItems = [
@@ -14,7 +13,6 @@ const navItems = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const { cartItems } = useCart();
   const location = useLocation();
 
@@ -53,10 +51,6 @@ export default function Navbar() {
 
   const toggleMenu = () => setIsMenuOpen((current) => !current);
   const closeMenu = () => setIsMenuOpen(false);
-  const openCart = () => {
-    closeMenu();
-    setIsCartOpen(true);
-  };
 
   return (
     <>
@@ -85,14 +79,15 @@ export default function Navbar() {
             <span className="navbar__logo-sub">Tattoo Studio</span>
           </Link>
 
-          <button
-            type="button"
-            className="navbar__cart-pill"
-            onClick={openCart}
+          <NavLink
+            to="/checkout"
+            className={({ isActive }) =>
+              `navbar__cart-pill ${isActive ? "navbar__cart-pill--active" : ""}`
+            }
           >
             <span>Carrito</span>
             <span className="navbar__cart-count">{totalItems}</span>
-          </button>
+          </NavLink>
         </div>
       </header>
 
@@ -130,8 +125,8 @@ export default function Navbar() {
         <div className="navbar__drawer-intro">
           <p className="navbar__drawer-title">Menu principal</p>
           <p className="navbar__drawer-copy">
-            Una solapa lateral para recorrer la web, ir al checkout o abrir el
-            carrito sin perder el foco.
+            La navegacion vive en la bambalina y el carrito queda resuelto en el
+            checkout, sin invadir el resto de la web.
           </p>
         </div>
 
@@ -153,43 +148,29 @@ export default function Navbar() {
               </NavLink>
             </li>
           ))}
-
-          {totalItems > 0 && (
-            <li>
-              <NavLink
-                to="/checkout"
-                className={({ isActive }) =>
-                  `navbar__drawer-link navbar__drawer-link--checkout ${
-                    isActive ? "navbar__drawer-link--active" : ""
-                  }`
-                }
-                onClick={closeMenu}
-              >
-                <span className="navbar__drawer-index">0{navItems.length + 1}</span>
-                <span>Checkout</span>
-              </NavLink>
-            </li>
-          )}
         </ul>
 
-        <button
-          type="button"
-          className="navbar__drawer-cart"
-          onClick={openCart}
+        <NavLink
+          to="/checkout"
+          className={({ isActive }) =>
+            `navbar__drawer-cart ${
+              isActive ? "navbar__drawer-cart--active" : ""
+            }`
+          }
+          onClick={closeMenu}
         >
-          <span>Abrir carrito</span>
+          <span>{totalItems > 0 ? "Carrito / Checkout" : "Ir al checkout"}</span>
           <span className="navbar__drawer-cart-count">{totalItems}</span>
-        </button>
+        </NavLink>
 
         <div className="navbar__drawer-footer">
-          <span className="navbar__footer-pill">Buenos Aires</span>
+          <span className="navbar__footer-pill">Checkout</span>
           <p className="navbar__footer-copy">
-            Tatuajes, prints y consultas desde una navegacion mas teatral.
+            El resumen del pedido vive dentro de checkout para no estorbar en las
+            demas paginas.
           </p>
         </div>
       </nav>
-
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 }
