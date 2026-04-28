@@ -1,35 +1,49 @@
-import { Link } from "react-router-dom";
-import emailjs from "emailjs-com";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useCart } from "../context/useCart";
 
 export default function Gracias() {
+  const [searchParams] = useSearchParams();
+  const { clearCart } = useCart();
+  const hasProcessedRef = useRef(false);
+  const paymentId =
+    searchParams.get("payment_id") ||
+    searchParams.get("collection_id") ||
+    "sin-id";
+
   useEffect(() => {
-    // Parámetros de prueba para la plantilla de EmailJS
-    const templateParams = {
-      email: "alissiaprecedo@hotmail.com", // Cambia por el email del comprador si lo tienes
-      nombre: "Cliente de prueba",
-      order_id: "12345",
-      pedidos: "1",
-      precio: "1000",
-      unidades: "2",
-      "cost.shipping": "500",
-    };
-    emailjs
-      .send(
-        "service_i9ya9g2",
-        "template_t7o6ny9",
-        templateParams,
-        "WJaZ-EVnzXkw09eqk",
-      )
-      .then(
-        (result) => {
-          console.log("Email enviado correctamente", result.text);
-        },
-        (error) => {
-          console.error("Error al enviar email:", error);
-        },
-      );
-  }, []);
+    if (hasProcessedRef.current) return;
+    hasProcessedRef.current = true;
+
+    const rawOrder = sessionStorage.getItem("lastOrder");
+
+    if (!rawOrder) {
+      clearCart();
+      return;
+    }
+
+    try {
+      const orderData = JSON.parse(rawOrder);
+      const items = Array.isArray(orderData.cartItems) ? orderData.cartItems : [];
+      const checkoutData = orderData.checkoutData || {};
+
+      if (items.length === 0 || !checkoutData.email) {
+        clearCart();
+        sessionStorage.removeItem("lastOrder");
+        sessionStorage.removeItem("checkoutData");
+        return;
+      }
+
+      clearCart();
+      sessionStorage.removeItem("lastOrder");
+      sessionStorage.removeItem("checkoutData");
+    } catch (error) {
+      console.error(`No se pudo procesar la orden ${paymentId}:`, error);
+      clearCart();
+      sessionStorage.removeItem("lastOrder");
+      sessionStorage.removeItem("checkoutData");
+    }
+  }, [clearCart, paymentId]);
 
   return (
     <main
@@ -69,7 +83,8 @@ export default function Gracias() {
 
         <p style={{ margin: "0 auto 1.5rem", maxWidth: 460, lineHeight: 1.7 }}>
           Tu pago fue recibido correctamente. En breve vas a poder seguir
-          explorando la tienda o volver a la galeria.
+          explorando la tienda o volver a la galeria. El envio se coordina
+          directamente con el vendedor.
         </p>
 
         <div

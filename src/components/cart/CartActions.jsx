@@ -3,17 +3,13 @@ import { useCart } from "../../context/useCart";
 
 export default function CartActions({ onClose }) {
   const navigate = useNavigate();
-  const { clearCart, cartItems, shipping } = useCart();
+  const { clearCart, cartItems } = useCart();
 
   const handleCheckout = () => {
-    if (shipping === 0) {
-      alert("Por favor calculá el envío antes de continuar");
-      return;
-    }
-
     onClose?.();
     navigate("/checkout");
   };
+
   const handleContinueShopping = () => {
     onClose?.();
   };

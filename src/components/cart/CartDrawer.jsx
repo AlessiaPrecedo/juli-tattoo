@@ -1,7 +1,6 @@
 import { useCart } from "../../context/useCart";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
-import ShippingCalculator from "./ShippingCalculator";
 import CartEmpty from "./CartEmpty";
 import CartActions from "./CartActions";
 
@@ -17,7 +16,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-lg font-semibold">Tu carrito</h2>
-        <button onClick={onClose}>✕</button>
+        <button onClick={onClose}>x</button>
       </div>
 
       {/* Body */}
@@ -30,8 +29,6 @@ export default function CartDrawer({ isOpen, onClose }) {
               {cartItems.map((item) => (
                 <CartItem key={`${item.id}-${item.size}`} item={item} />
               ))}
-
-              <ShippingCalculator />
             </>
           )}
         </div>
@@ -47,4 +44,3 @@ export default function CartDrawer({ isOpen, onClose }) {
     </div>
   );
 }
-

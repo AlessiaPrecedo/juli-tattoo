@@ -7,15 +7,10 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  const [shipping, setShipping] = useState(() => {
-    const savedShipping = sessionStorage.getItem("shipping");
-    return savedShipping ? JSON.parse(savedShipping) : 0;
-  });
-
   useEffect(() => {
     sessionStorage.setItem("cart", JSON.stringify(cartItems));
-    sessionStorage.setItem("shipping", JSON.stringify(shipping));
-  }, [cartItems, shipping]);
+  }, [cartItems]);
+
   const addToCart = (product) => {
     setCartItems((prev) => {
       const existing = prev.find(
@@ -52,9 +47,7 @@ export function CartProvider({ children }) {
 
   const clearCart = () => {
     setCartItems([]);
-    setShipping(0);
     sessionStorage.removeItem("cart");
-    sessionStorage.removeItem("shipping");
   };
 
   const subtotal = useMemo(() => {
@@ -62,15 +55,13 @@ export function CartProvider({ children }) {
   }, [cartItems]);
 
   const total = useMemo(() => {
-    return subtotal + shipping;
-  }, [subtotal, shipping]);
+    return subtotal;
+  }, [subtotal]);
 
   return (
     <CartContext.Provider
       value={{
         cartItems,
-        shipping,
-        setShipping,
         addToCart,
         removeFromCart,
         updateQuantity,

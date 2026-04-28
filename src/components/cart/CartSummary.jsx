@@ -1,7 +1,7 @@
 import { useCart } from "../../context/useCart";
 
 export default function CartSummary() {
-  const { subtotal, shipping, total } = useCart();
+  const { subtotal, total } = useCart();
 
   const formatPrice = (value) =>
     value.toLocaleString("es-AR", {
@@ -17,9 +17,8 @@ export default function CartSummary() {
         <span>{formatPrice(subtotal)}</span>
       </div>
 
-      <div className="flex justify-between text-sm">
-        <span>Envío</span>
-        <span>{shipping === 0 ? "A calcular" : formatPrice(shipping)}</span>
+      <div className="text-sm">
+        <span>envio a coordinar con el vendedor</span>
       </div>
 
       <div className="border-t pt-3 flex justify-between font-semibold text-lg">
@@ -29,4 +28,3 @@ export default function CartSummary() {
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
 import { useCart } from "../../context/useCart";
 
 export default function PaymentButton({ disabled }) {
-  const { cartItems } = useCart();
+  const { cartItems, subtotal, total } = useCart();
 
   const handlePayment = async () => {
     try {
@@ -9,6 +9,22 @@ export default function PaymentButton({ disabled }) {
         alert("No hay productos en el carrito para iniciar el pago");
         return;
       }
+
+      const savedCheckoutData = sessionStorage.getItem("checkoutData");
+      const checkoutData = savedCheckoutData
+        ? JSON.parse(savedCheckoutData)
+        : {};
+
+      sessionStorage.setItem(
+        "lastOrder",
+        JSON.stringify({
+          cartItems,
+          checkoutData,
+          subtotal,
+          total,
+          createdAt: new Date().toISOString(),
+        }),
+      );
 
       const res = await fetch("/api/create-preference", {
         method: "POST",
