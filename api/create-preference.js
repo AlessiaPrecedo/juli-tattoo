@@ -43,6 +43,7 @@ export default async function handler(req, res) {
     const preference = await preferenceClient.create({
       body: {
         items,
+        notification_url: `${baseUrl}/api/webhook`,
         back_urls: {
           success: `${baseUrl}/gracias`,
           failure: `${baseUrl}/checkout`,
