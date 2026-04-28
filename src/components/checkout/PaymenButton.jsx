@@ -33,6 +33,7 @@ export default function PaymentButton({ disabled }) {
         },
         body: JSON.stringify({
           cartItems,
+          checkoutData,
         }),
       });
 

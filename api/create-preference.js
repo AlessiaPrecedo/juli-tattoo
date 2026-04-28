@@ -43,12 +43,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "MP_ACCESS_TOKEN no configurado" });
     }
 
-    const { cartItems = [] } = req.body || {};
+    const { cartItems = [], checkoutData = {} } = req.body || {};
 
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return res
         .status(400)
         .json({ error: "No hay productos para crear la preferencia" });
+    }
+
+    const checkoutEmail = String(checkoutData.email || "").trim();
+
+    if (!checkoutEmail) {
+      return res.status(400).json({
+        error: "Falta el email del checkout para crear la preferencia",
+      });
     }
 
     const client = new MercadoPagoConfig({
@@ -73,6 +81,17 @@ export default async function handler(req, res) {
     const preference = await preferenceClient.create({
       body: {
         items,
+        payer: {
+          email: checkoutEmail,
+          name: String(checkoutData.nombre || "").trim() || undefined,
+          surname: String(checkoutData.apellido || "").trim() || undefined,
+        },
+        metadata: {
+          checkoutEmail,
+          customerName: String(checkoutData.nombre || "").trim(),
+          customerLastName: String(checkoutData.apellido || "").trim(),
+          customerPhone: String(checkoutData.telefono || "").trim(),
+        },
         notification_url: `${baseUrl}/api/webhook`,
         back_urls: {
           success: `${baseUrl}/gracias`,

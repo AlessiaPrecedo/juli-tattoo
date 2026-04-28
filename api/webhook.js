@@ -37,6 +37,22 @@ function getPaymentId(body, query) {
   return paymentId ? String(paymentId) : null;
 }
 
+function getBuyerEmail(payment) {
+  const candidates = [
+    payment?.metadata?.checkoutEmail,
+    payment?.metadata?.checkout_email,
+    payment?.order?.additional_info?.payer?.email,
+    payment?.additional_info?.payer?.email,
+    payment?.payer?.email,
+  ];
+
+  const email = candidates.find(
+    (candidate) => typeof candidate === "string" && candidate.trim().length > 0,
+  );
+
+  return email ? email.trim() : null;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -82,9 +98,12 @@ export default async function handler(req, res) {
     const payment = await paymentClient.get({ id: paymentId });
 
     const status = payment.status;
-    const email = payment.payer?.email;
+    const email = getBuyerEmail(payment);
 
-    console.log(`Pago ${paymentId} con estado ${status} para el email ${email}`);
+    console.log(`Pago ${paymentId} con estado ${status} para el email ${email}`, {
+      metadata: payment.metadata,
+      payer: payment.payer,
+    });
 
     if (status !== "approved" || !email) {
       return res.status(200).json({
