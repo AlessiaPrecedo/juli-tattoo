@@ -97,6 +97,29 @@ export default async function handler(req, res) {
           email: checkoutEmail,
           name: String(checkoutData.nombre || "").trim() || undefined,
           surname: String(checkoutData.apellido || "").trim() || undefined,
+          phone: String(checkoutData.telefono || "").trim()
+            ? {
+                number: String(checkoutData.telefono || "").trim(),
+              }
+            : undefined,
+        },
+        additional_info: {
+          payer: {
+            first_name: String(checkoutData.nombre || "").trim() || undefined,
+            last_name: String(checkoutData.apellido || "").trim() || undefined,
+            phone: String(checkoutData.telefono || "").trim()
+              ? {
+                  number: String(checkoutData.telefono || "").trim(),
+                }
+              : undefined,
+            email: checkoutEmail || undefined,
+          },
+          items: items.map((item) => ({
+            title: item.title,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            currency_id: item.currency_id,
+          })),
         },
         metadata: {
           checkoutEmail,

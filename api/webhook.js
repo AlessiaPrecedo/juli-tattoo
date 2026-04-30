@@ -44,10 +44,22 @@ function getMetadataValue(metadata, key) {
 
 function getBuyerOrderData(payment) {
   const metadata = payment?.metadata || {};
-  const firstName = getMetadataValue(metadata, "customerName") || "";
-  const lastName = getMetadataValue(metadata, "customerLastName") || "";
-  const phone = getMetadataValue(metadata, "customerPhone") || "";
+  const additionalInfoPayer =
+    payment?.additional_info?.payer || payment?.order?.additional_info?.payer;
+  const firstName =
+    additionalInfoPayer?.first_name ||
+    getMetadataValue(metadata, "customerName") ||
+    "";
+  const lastName =
+    additionalInfoPayer?.last_name ||
+    getMetadataValue(metadata, "customerLastName") ||
+    "";
+  const phone =
+    additionalInfoPayer?.phone?.number ||
+    getMetadataValue(metadata, "customerPhone") ||
+    "";
   const email =
+    additionalInfoPayer?.email ||
     getMetadataValue(metadata, "checkoutEmail") ||
     payment?.payer?.email ||
     "";
