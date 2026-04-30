@@ -77,6 +77,18 @@ export default async function handler(req, res) {
       unit_price: Number(item.price),
       currency_id: "ARS",
     }));
+    const productsSummary = cartItems
+      .map((item) => {
+        const quantity = Number(item.quantity || 0);
+        const sizeLabel = item.size ? ` (${item.size})` : "";
+
+        return `${item.name}${sizeLabel} x${quantity}`;
+      })
+      .join(" | ");
+    const orderTotal = cartItems.reduce(
+      (acc, item) => acc + Number(item.price || 0) * Number(item.quantity || 0),
+      0,
+    );
 
     const preference = await preferenceClient.create({
       body: {
@@ -91,6 +103,8 @@ export default async function handler(req, res) {
           customerName: String(checkoutData.nombre || "").trim(),
           customerLastName: String(checkoutData.apellido || "").trim(),
           customerPhone: String(checkoutData.telefono || "").trim(),
+          productsSummary,
+          orderTotal,
         },
         notification_url: `${baseUrl}/api/webhook`,
         back_urls: {

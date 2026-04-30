@@ -1,5 +1,5 @@
 import { MercadoPagoConfig, Payment } from "mercadopago";
-import { Resend } from "resend";
+import { appendOrderToSheet } from "./lib/googleSheets.js";
 
 function extractIdFromResource(resource) {
   if (typeof resource !== "string" || resource.length === 0) return null;
@@ -37,20 +37,36 @@ function getPaymentId(body, query) {
   return paymentId ? String(paymentId) : null;
 }
 
-function getBuyerEmail(payment) {
-  const candidates = [
-    payment?.metadata?.checkoutEmail,
-    payment?.metadata?.checkout_email,
-    payment?.order?.additional_info?.payer?.email,
-    payment?.additional_info?.payer?.email,
-    payment?.payer?.email,
-  ];
+function getMetadataValue(metadata, key) {
+  const value = metadata?.[key];
+  return typeof value === "string" ? value.trim() : value;
+}
 
-  const email = candidates.find(
-    (candidate) => typeof candidate === "string" && candidate.trim().length > 0,
-  );
+function getBuyerOrderData(payment) {
+  const metadata = payment?.metadata || {};
+  const firstName = getMetadataValue(metadata, "customerName") || "";
+  const lastName = getMetadataValue(metadata, "customerLastName") || "";
+  const phone = getMetadataValue(metadata, "customerPhone") || "";
+  const email =
+    getMetadataValue(metadata, "checkoutEmail") ||
+    payment?.payer?.email ||
+    "";
+  const products =
+    getMetadataValue(metadata, "productsSummary") ||
+    payment?.additional_info?.items
+      ?.map((item) => `${item.title} x${item.quantity}`)
+      .join(" | ") ||
+    "";
+  const total = Number(metadata?.orderTotal || payment?.transaction_amount || 0);
 
-  return email ? email.trim() : null;
+  return {
+    firstName,
+    lastName,
+    phone,
+    email,
+    products,
+    total,
+  };
 }
 
 export default async function handler(req, res) {
@@ -61,16 +77,9 @@ export default async function handler(req, res) {
 
   try {
     const accessToken = process.env.MP_ACCESS_TOKEN;
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const resendFrom =
-      process.env.RESEND_FROM || "Juli Tattoo <onboarding@resend.dev>";
 
     if (!accessToken) {
       return res.status(500).json({ error: "MP_ACCESS_TOKEN no configurado" });
-    }
-
-    if (!resendApiKey) {
-      return res.status(500).json({ error: "RESEND_API_KEY no configurado" });
     }
 
     const body = req.body && typeof req.body === "object" ? req.body : {};
@@ -98,50 +107,50 @@ export default async function handler(req, res) {
     const payment = await paymentClient.get({ id: paymentId });
 
     const status = payment.status;
-    const email = getBuyerEmail(payment);
+    const orderData = getBuyerOrderData(payment);
 
-    console.log(`Pago ${paymentId} con estado ${status} para el email ${email}`, {
+    console.log(`Pago ${paymentId} con estado ${status}`, {
       metadata: payment.metadata,
       payer: payment.payer,
+      transactionAmount: payment.transaction_amount,
     });
 
-    if (status !== "approved" || !email) {
+    if (status !== "approved") {
       return res.status(200).json({
         received: true,
         ignored: true,
         paymentId,
         status,
-        reason: "Payment not approved or missing payer email",
+        reason: "Payment not approved",
       });
     }
 
-    const resend = new Resend(resendApiKey);
-    const { data, error } = await resend.emails.send({
-      from: resendFrom,
-      to: [email],
-      subject: "Pago aprobado",
-      html: `
-        <p>Hola!</p>
-        <p>Gracias por tu compra en Juli Tattoo.</p>
-        <p>Te confirmamos que tu pago fue aprobado.</p>
-        <p>El envio se coordina directamente con el vendedor.</p>
-      `,
+    const sheetResult = await appendOrderToSheet({
+      date: new Date().toISOString(),
+      paymentId,
+      status,
+      firstName: orderData.firstName,
+      lastName: orderData.lastName,
+      phone: orderData.phone,
+      email: orderData.email,
+      products: orderData.products,
+      total: orderData.total,
     });
 
-    if (error) {
-      throw new Error(`Resend error: ${error.message}`);
-    }
-
-    console.log("Email enviado correctamente:", {
+    console.log("Pago aprobado registrado para Google Sheets:", {
       paymentId,
-      email,
-      resendId: data?.id,
+      status,
+      sheetSkipped: sheetResult.skipped,
+      checkoutEmail: orderData.email || null,
+      transactionAmount: orderData.total,
     });
 
     return res.status(200).json({
       received: true,
       paymentId,
-      resendId: data?.id || null,
+      status,
+      approved: true,
+      sheetSkipped: sheetResult.skipped,
     });
   } catch (error) {
     console.error("Error procesando webhook:", error);
