@@ -25,7 +25,7 @@ export default function PaymentButton({ disabled }) {
           createdAt: new Date().toISOString(),
         }),
       );
-
+      //...
       const res = await fetch("/api/create-preference", {
         method: "POST",
         headers: {
