@@ -9,7 +9,7 @@ export default function PaymentButton({ disabled }) {
         alert("No hay productos en el carrito para iniciar el pago");
         return;
       }
-
+      // Guardar los datos del pedido en sessionStorage para el resumen de la orden
       const savedCheckoutData = sessionStorage.getItem("checkoutData");
       const checkoutData = savedCheckoutData
         ? JSON.parse(savedCheckoutData)
@@ -52,8 +52,7 @@ export default function PaymentButton({ disabled }) {
 
       if (!res.ok) {
         throw new Error(
-          data.error ||
-            `Error creando la preferencia de pago (${res.status})`,
+          data.error || `Error creando la preferencia de pago (${res.status})`,
         );
       }
 
