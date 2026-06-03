@@ -13,8 +13,8 @@ export default function Hero() {
 
       <div className="hero__content">
         <h1 className="hero__title">
-          <span className="hero__title-thin">Juli Brz</span>
-          <span className="hero__title-italic">Tattoo</span>
+          <span className="hero__title-thin">✿ JULIETA BRZ ✿</span>
+          <span className="hero__title-italic">Tattoo & Merch</span>
         </h1>
 
         <p className="hero__subtitle">
