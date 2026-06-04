@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useCart } from "../../context/useCart";
 
+const formatPrices = {
+  A4: 15000,
+  A3: 28000,
+  "50x70": 35000,
+};
+
 export default function ProductCard({ product, onPreview }) {
   const { addToCart } = useCart();
   const [selectedFormat, setSelectedFormat] = useState("");
@@ -8,7 +14,7 @@ export default function ProductCard({ product, onPreview }) {
     style: "currency",
     currency: "ARS",
     maximumFractionDigits: 0,
-  }).format(product.price);
+  }).format(selectedFormat ? formatPrices[selectedFormat] : product.price);
 
   const handleAddToCart = () => {
     if (!selectedFormat) {
@@ -19,6 +25,7 @@ export default function ProductCard({ product, onPreview }) {
     addToCart({
       ...product,
       size: selectedFormat,
+      price: formatPrices[selectedFormat],
     });
   };
 

@@ -5,10 +5,12 @@ export default function Prints() {
   return (
     <main className="prints-page">
       <section className="prints-page__hero">
-        <p className="prints-page__eyebrow">Prints disponibles</p>
+        <p className="prints-page__eyebrow">
+          PINTURAS ORIGINALES & OBJETOS ÚNICOS{" "}
+        </p>
         <h1>Arte para llevar</h1>
         <p className="prints-page__intro">
-          Ilustraciones impresas en formatos seleccionados. Elegi el tamano,
+          Ilustraciones impresas en formatos seleccionados. Elegi el tamao,
           sumalo al carrito y coordinamos el envio.
         </p>
       </section>

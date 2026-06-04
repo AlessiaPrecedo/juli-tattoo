@@ -27,10 +27,13 @@ const SobreMi = () => (
           Hola, soy <em>Juli</em>
         </h2>
         <p className="sobre-mi__body">
-          Tatuadora independiente con base en Buenos Aires. Me especializo en
-          diseños con línea fina, ilustración y elementos orgánicos. Cada
-          tatuaje es un proyecto único pensado junto a vos, desde el boceto
-          hasta la aguja.
+          Tatuadora independiente de Buenos Aires. Desde que tengo uso de razón
+          me gustó pintar y, por suerte, en casa nunca faltó un pincel. Me
+          especializo en tatuajes a color y disfruto trabajar cada diseño de
+          manera personalizada, porque creo que cada idea merece una pieza
+          única. Mi objetivo es que te lleves un tattoo que te represente y te
+          acompañe en el tiempo. Actualmente tatuo en Lomitas, Avellaneda y CABA
+          (San Telmo).
         </p>
         <p className="sobre-mi__body">
           Trabajo en estudio propio con materiales de primera calidad y estricto
@@ -51,7 +54,7 @@ const SobreMi = () => (
 
 /* ── Sección: Preview Galería ── */
 const GaleriaPreview = () => {
-  const images = ["/tattoo/tattoo1.jpg", "/tattoo/tattoo2.jpg"];
+  const images = ["../tattoo/tattoo1.jpg", "../tattoo/tattoo2.jpg"];
   return (
     <section className="galeria-preview">
       <div className="galeria-preview__header">
