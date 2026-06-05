@@ -10,7 +10,7 @@ export default function Prints() {
         </p>
         <h1>Arte para llevar</h1>
         <p className="prints-page__intro">
-          Ilustraciones impresas en formatos seleccionados. Elegi el tamao,
+          Ilustraciones impresas en formatos seleccionados. Elegi el tamaño,
           sumalo al carrito y coordinamos el envio.
         </p>
       </section>

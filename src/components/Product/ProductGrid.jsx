@@ -7,7 +7,7 @@ const products = [
     id: 1,
     name: "Rani Tatuera",
     image: "/prints/ranita.jpg",
-    formats: ["A4", "A3", "50x70"],
+    formats: ["A4", "A3"],
   },
   {
     id: 2,
